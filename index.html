@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Panggil Antrian & Pengumuman</title>
+    <meta name="description"
+        content="Sistem text-to-speech untuk memanggil antrian kendaraan dan pengumuman departemen." />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-logo">
+                <span class="logo-icon">📢</span>
+                <div>
+                    <h1 class="header-title">Sistem Antrian & Pengumuman</h1>
+                    <p class="header-sub">Departemen Lokal — Text-to-Speech</p>
+                </div>
+            </div>
+            <div class="header-status" id="tts-status">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Siap</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- FIREFOX / FILE:// WARNING BANNER -->
+    <div class="warn-banner" id="warn-banner" style="display:none;">
+        <span class="warn-icon">⚠️</span>
+        <div class="warn-text">
+            <strong>Firefox terdeteksi via file://</strong> —
+            Web Speech API mungkin tidak berfungsi. Gunakan
+            <strong>jalankan.bat</strong> untuk membuka via server lokal
+            (http://localhost:8080), atau gunakan Chrome/Edge.
+        </div>
+        <button class="warn-close" onclick="document.getElementById('warn-banner').style.display='none'">✕</button>
+    </div>
+
+    <main class="main-content">
+
+        <!-- TAB NAVIGATION -->
+        <nav class="tab-nav" role="tablist">
+            <button class="tab-btn active" id="tab-queue-btn" role="tab" aria-selected="true"
+                onclick="switchTab('queue')">
+                🚗 Antrian Kendaraan
+            </button>
+            <button class="tab-btn" id="tab-announce-btn" role="tab" aria-selected="false"
+                onclick="switchTab('announce')">
+                📣 Pengumuman
+            </button>
+            <button class="tab-btn" id="tab-settings-btn" role="tab" aria-selected="false"
+                onclick="switchTab('settings')">
+                ⚙️ Pengaturan
+            </button>
+        </nav>
+
+        <!-- ===================== TAB: ANTRIAN ===================== -->
+        <section class="tab-panel" id="panel-queue">
+
+            <!-- Input Antrian -->
+            <div class="card">
+                <h2 class="card-title">➕ Tambah Antrian</h2>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="input-plat">Nomor Polisi / Nama</label>
+                        <input type="text" id="input-plat" placeholder="Contoh: B 1234 ABC atau TRUK PASIR"
+                            autocomplete="off" />
+                    </div>
+                    <div class="input-group">
+                        <label for="input-keperluan">Keperluan (opsional)</label>
+                        <input type="text" id="input-keperluan" placeholder="Contoh: muat barang, timbang, dll"
+                            autocomplete="off" />
+                    </div>
+                    <button class="btn btn-primary" onclick="addToQueue()" id="btn-add-queue">
+                        Tambah ke Antrian
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Panggil -->
+            <div class="card">
+                <h2 class="card-title">⚡ Panggil Cepat</h2>
+                <p class="card-desc">Panggil langsung tanpa menambah ke daftar antrian.</p>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="input-quick">Nomor / Nama Kendaraan</label>
+                        <input type="text" id="input-quick" placeholder="Ketik dan klik Panggil" autocomplete="off" />
+                    </div>
+                    <button class="btn btn-accent" onclick="quickCall()" id="btn-quick">
+                        📢 Panggil Sekarang
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daftar Antrian -->
+            <div class="card">
+                <div class="card-header-row">
+                    <h2 class="card-title">📋 Daftar Antrian</h2>
+                    <div class="queue-actions">
+                        <span class="badge" id="queue-count">0 antrian</span>
+                        <button class="btn btn-sm btn-danger" onclick="clearQueue()">🗑️ Hapus Semua</button>
+                    </div>
+                </div>
+
+                <!-- Antrian Sedang Dipanggil -->
+                <div class="current-call-box" id="current-call-box" style="display:none;">
+                    <div class="current-call-label">🔊 Sedang Dipanggil</div>
+                    <div class="current-call-name" id="current-call-name">—</div>
+                </div>
+
+                <!-- List -->
+                <div class="queue-list" id="queue-list">
+                    <div class="queue-empty" id="queue-empty">
+                        <span class="queue-empty-icon">🚗</span>
+                        <p>Belum ada antrian. Tambahkan kendaraan di atas.</p>
+                    </div>
+                </div>
+
+                <!-- Kontrol Antrian -->
+                <div class="queue-controls">
+                    <button class="btn btn-success btn-lg" onclick="callNext()" id="btn-call-next" disabled>
+                        ▶️ Panggil Berikutnya
+                    </button>
+                    <button class="btn btn-outline" onclick="repeatCall()" id="btn-repeat" disabled>
+                        🔂 Ulangi Panggilan
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== TAB: PENGUMUMAN ===================== -->
+        <section class="tab-panel hidden" id="panel-announce">
+
+            <!-- Template Pengumuman -->
+            <div class="card">
+                <h2 class="card-title">⚡ Template Cepat</h2>
+                <p class="card-desc">Klik untuk langsung mengumumkan.</p>
+                <div class="template-grid" id="template-grid">
+                    <!-- Diisi oleh JS -->
+                </div>
+            </div>
+
+            <!-- Pengumuman Kustom -->
+            <div class="card">
+                <h2 class="card-title">✏️ Pengumuman Kustom</h2>
+                <div class="input-group">
+                    <label for="input-announce">Teks Pengumuman</label>
+                    <textarea id="input-announce" rows="4" placeholder="Ketik teks pengumuman di sini..."></textarea>
+                </div>
+                <div class="input-row" style="margin-top:12px;">
+                    <button class="btn btn-accent" onclick="announceCustom()" id="btn-announce">
+                        📢 Umumkan
+                    </button>
+                    <button class="btn btn-outline" onclick="clearAnnounce()">🗑️ Hapus Teks</button>
+                </div>
+            </div>
+
+            <!-- Riwayat -->
+            <div class="card">
+                <div class="card-header-row">
+                    <h2 class="card-title">📜 Riwayat Pengumuman</h2>
+                    <button class="btn btn-sm btn-danger" onclick="clearHistory()">🗑️ Hapus</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <div class="queue-empty">
+                        <span class="queue-empty-icon">📜</span>
+                        <p>Belum ada riwayat pengumuman.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== TAB: PENGATURAN ===================== -->
+        <section class="tab-panel hidden" id="panel-settings">
+            <div class="card">
+                <h2 class="card-title">🔊 Pengaturan Suara</h2>
+
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="setting-voice">Suara (Voice)</label>
+                        <select id="setting-voice">
+                            <option value="">Memuat daftar suara...</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="setting-rate">Kecepatan Bicara: <span id="rate-val">1.0</span>x</label>
+                        <input type="range" id="setting-rate" min="0.5" max="2" step="0.1" value="1.0"
+                            oninput="document.getElementById('rate-val').textContent = parseFloat(this.value).toFixed(1)" />
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="setting-pitch">Nada Suara: <span id="pitch-val">1.0</span></label>
+                        <input type="range" id="setting-pitch" min="0.5" max="2" step="0.1" value="1.0"
+                            oninput="document.getElementById('pitch-val').textContent = parseFloat(this.value).toFixed(1)" />
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="setting-volume">Volume: <span id="volume-val">100</span>%</label>
+                        <input type="range" id="setting-volume" min="0" max="1" step="0.05" value="1"
+                            oninput="document.getElementById('volume-val').textContent = Math.round(this.value * 100)" />
+                    </div>
+                </div>
+
+                <div class="setting-item" style="margin-top:16px;">
+                    <label for="setting-prefix">Awalan Panggilan Antrian</label>
+                    <input type="text" id="setting-prefix" value="Kendaraan dengan nomor polisi"
+                        placeholder="Teks sebelum nomor kendaraan" />
+                </div>
+
+                <div class="setting-item" style="margin-top:12px;">
+                    <label for="setting-suffix">Akhiran Panggilan Antrian</label>
+                    <input type="text" id="setting-suffix" value="harap segera menuju area timbangan. Terima kasih."
+                        placeholder="Teks setelah nomor kendaraan" />
+                </div>
+
+                <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="testVoice()">🔊 Test Suara</button>
+                    <button class="btn btn-outline" onclick="saveSettings()">💾 Simpan Pengaturan</button>
+                    <button class="btn btn-outline"
+                        onclick="loadVoicesWithRetry(20); showToast('🔄 Memuat ulang daftar suara...','info')">🔄 Muat
+                        Ulang Suara</button>
+                </div>
+
+                <!-- Banner aktivasi manual (muncul jika polling gagal) -->
+                <div id="activate-banner" style="display:none; margin-top:16px; background:rgba(79,142,247,0.1);
+                     border:1px solid rgba(79,142,247,0.4); border-radius:10px; padding:16px; gap:14px;
+                     align-items:center; flex-wrap:wrap;">
+                    <div style="flex:1; font-size:0.9rem; line-height:1.6;">
+                        <strong style="color:#7dd3fc;">🔇 Suara belum aktif</strong><br />
+                        Firefox memerlukan interaksi pertama untuk mengaktifkan mesin suara.
+                        Klik tombol di samping untuk mengaktifkan.
+                    </div>
+                    <button class="btn btn-primary" onclick="activateTTS()">🔊 Aktifkan Suara</button>
+                </div>
+
+                <!-- Pesan jika suara benar-benar tidak tersedia -->
+                <div id="no-voice-msg" style="display:none; margin-top:14px; background:rgba(239,68,68,0.08);
+                     border:1px solid rgba(239,68,68,0.3); border-radius:10px; padding:16px;
+                     font-size:0.88rem; line-height:1.7; color:#fca5a5;">
+                    <strong>❌ Suara tidak ditemukan.</strong> Kemungkinan penyebab:<br />
+                    <ul style="margin:8px 0 0 16px; color:#e2e8f0;">
+                        <li>Firefox di <strong>Linux</strong>: install paket TTS dengan perintah:<br />
+                            <code style="background:#0f1117; padding:3px 8px; border-radius:4px; font-size:0.85rem;">
+                                sudo apt install speech-dispatcher</code> lalu restart Firefox.
+                        </li>
+                        <li>Firefox di <strong>Windows</strong>: pastikan Windows Speech/Narrator
+                            sudah diaktifkan di <em>Settings → Time &amp; Language → Speech</em>.</li>
+                        <li>Alternatif: gunakan <strong>Chrome</strong> atau <strong>Edge</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">ℹ️ Informasi</h2>
+                <div class="info-table">
+                    <div class="info-row"><span>Browser</span><span id="info-browser">—</span></div>
+                    <div class="info-row"><span>TTS Support</span><span id="info-tts">—</span></div>
+                    <div class="info-row"><span>Jumlah Voice</span><span id="info-voices">—</span></div>
+                    <div class="info-row"><span>Versi App</span><span>1.0.0</span></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
