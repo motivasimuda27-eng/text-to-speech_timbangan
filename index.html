@@ -8,6 +8,7 @@
     <meta name="description"
         content="Sistem text-to-speech untuk memanggil antrian kendaraan dan pengumuman departemen." />
     <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📢</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
@@ -22,7 +23,7 @@
                 <span class="logo-icon">📢</span>
                 <div>
                     <h1 class="header-title">Sistem Antrian & Pengumuman</h1>
-                    <p class="header-sub">Departemen Lokal — Text-to-Speech</p>
+                    <p class="header-sub">Departemen Lokal — Edge-TTS Engine</p>
                 </div>
             </div>
             <div class="header-status" id="tts-status">
@@ -32,19 +33,18 @@
         </div>
     </header>
 
-    <!-- FIREFOX / FILE:// WARNING BANNER -->
-    <div class="warn-banner" id="warn-banner" style="display:none;">
-        <span class="warn-icon">⚠️</span>
+    <main class="main-content">
+    <!-- SERVER EDGE-TTS INFO BANNER -->
+    <div class="warn-banner" id="server-banner" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.3);display:flex;">
+        <span class="warn-icon">🔊</span>
         <div class="warn-text">
-            <strong>Firefox terdeteksi via file://</strong> —
-            Web Speech API mungkin tidak berfungsi. Gunakan
-            <strong>jalankan.bat</strong> untuk membuka via server lokal
-            (http://localhost:8080), atau gunakan Chrome/Edge.
+            <strong>Engine: Microsoft Edge-TTS</strong> —
+            Pastikan <strong>server.py</strong> sudah berjalan
+            (<code>python3 server.py</code>) di port 5000 sebelum menggunakan aplikasi ini.
         </div>
-        <button class="warn-close" onclick="document.getElementById('warn-banner').style.display='none'">✕</button>
+        <button class="warn-close" onclick="document.getElementById('server-banner').style.display='none'">✕</button>
     </div>
 
-    <main class="main-content">
 
         <!-- TAB NAVIGATION -->
         <nav class="tab-nav" role="tablist">
@@ -226,38 +226,12 @@
                     <button class="btn btn-primary" onclick="testVoice()">🔊 Test Suara</button>
                     <button class="btn btn-outline" onclick="saveSettings()">💾 Simpan Pengaturan</button>
                     <button class="btn btn-outline"
-                        onclick="loadVoicesWithRetry(20); showToast('🔄 Memuat ulang daftar suara...','info')">🔄 Muat
+                        onclick="loadEdgeVoices()">🔄 Muat
                         Ulang Suara</button>
                 </div>
-
-                <!-- Banner aktivasi manual (muncul jika polling gagal) -->
-                <div id="activate-banner" style="display:none; margin-top:16px; background:rgba(79,142,247,0.1);
-                     border:1px solid rgba(79,142,247,0.4); border-radius:10px; padding:16px; gap:14px;
-                     align-items:center; flex-wrap:wrap;">
-                    <div style="flex:1; font-size:0.9rem; line-height:1.6;">
-                        <strong style="color:#7dd3fc;">🔇 Suara belum aktif</strong><br />
-                        Firefox memerlukan interaksi pertama untuk mengaktifkan mesin suara.
-                        Klik tombol di samping untuk mengaktifkan.
-                    </div>
-                    <button class="btn btn-primary" onclick="activateTTS()">🔊 Aktifkan Suara</button>
+<button class="btn btn-primary" onclick="activateTTS()">🔊 Aktifkan Suara</button>
                 </div>
-
-                <!-- Pesan jika suara benar-benar tidak tersedia -->
-                <div id="no-voice-msg" style="display:none; margin-top:14px; background:rgba(239,68,68,0.08);
-                     border:1px solid rgba(239,68,68,0.3); border-radius:10px; padding:16px;
-                     font-size:0.88rem; line-height:1.7; color:#fca5a5;">
-                    <strong>❌ Suara tidak ditemukan.</strong> Kemungkinan penyebab:<br />
-                    <ul style="margin:8px 0 0 16px; color:#e2e8f0;">
-                        <li>Firefox di <strong>Linux</strong>: install paket TTS dengan perintah:<br />
-                            <code style="background:#0f1117; padding:3px 8px; border-radius:4px; font-size:0.85rem;">
-                                sudo apt install speech-dispatcher</code> lalu restart Firefox.
-                        </li>
-                        <li>Firefox di <strong>Windows</strong>: pastikan Windows Speech/Narrator
-                            sudah diaktifkan di <em>Settings → Time &amp; Language → Speech</em>.</li>
-                        <li>Alternatif: gunakan <strong>Chrome</strong> atau <strong>Edge</strong>.</li>
-                    </ul>
-                </div>
-            </div>
+</div>
 
             <div class="card">
                 <h2 class="card-title">ℹ️ Informasi</h2>
@@ -265,7 +239,7 @@
                     <div class="info-row"><span>Browser</span><span id="info-browser">—</span></div>
                     <div class="info-row"><span>TTS Support</span><span id="info-tts">—</span></div>
                     <div class="info-row"><span>Jumlah Voice</span><span id="info-voices">—</span></div>
-                    <div class="info-row"><span>Versi App</span><span>1.0.0</span></div>
+                    <div class="info-row"><span>Versi App</span><span>2.0.0 (edge-tts)</span></div>
                 </div>
             </div>
         </section>
