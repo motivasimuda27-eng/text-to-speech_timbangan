@@ -291,15 +291,17 @@ function callItem(item) {
     showToast(`🔊 Memanggil: ${item.name}`, 'info');
 }
 
-function expandDigits(text) {
-    //pisahkan digit
-    return text.replace(/\d{2,}/g, m => m.split(''));
+function spellPlate(name) {
+    //eja setiap token
+    return name.split(' ')
+        .map(token => token.split('').join(' ')) //eja setiap karakter
+        .join('  ');
 }
 
 function buildCallText(name) {
     const prefix = settings.prefix || '';
     const suffix = settings.suffix || '';
-    return `${prefix} ${expandDigits(name)}. ${suffix}`.replace(/\s+/g, ' ').trim();
+    return `${prefix} ${spellPlate(name)}. ${suffix}`.replace(/\s+/g, ' ').trim();
 }
 
 function repeatCall() {
