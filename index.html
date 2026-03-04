@@ -22,8 +22,8 @@
             <div class="header-logo">
                 <span class="logo-icon">📢</span>
                 <div>
-                    <h1 class="header-title">Sistem Antrian & Pengumuman</h1>
-                    <p class="header-sub">Departemen Lokal — Edge-TTS Engine</p>
+                    <h1 class="header-title">Sistem Speech Antrian & Pengumuman Timbangan</h1>
+                    <p class="header-sub">© 2025 Huda Timbangan BAS</p>
                 </div>
             </div>
             <div class="header-status" id="tts-status">
@@ -38,7 +38,7 @@
     <div class="warn-banner" id="server-banner" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.3);display:flex;">
         <span class="warn-icon">🔊</span>
         <div class="warn-text">
-            <strong>Engine: Microsoft Edge-TTS</strong> —
+            <strong>Engine: Python - edge-tts</strong> —
             Pastikan <strong>server.py</strong> sudah berjalan
             (<code>python3 server.py</code>) di port 5000 sebelum menggunakan aplikasi ini.
         </div>
@@ -71,7 +71,7 @@
                 <div class="input-row">
                     <div class="input-group">
                         <label for="input-plat">Nomor Polisi / Nama</label>
-                        <input type="text" id="input-plat" placeholder="Contoh: B 1234 ABC atau TRUK PASIR"
+                        <input type="text" id="input-plat" placeholder="Masukan nomor polisi"
                             autocomplete="off" />
                     </div>
                     <div class="input-group">
@@ -80,7 +80,7 @@
                             autocomplete="off" />
                     </div>
                     <div class="input-group">
-                        <label for="input-keperluan">Keperluan (opsional)</label>
+                        <label for="input-keperluan">Keperluan</label>
                         <select id="input-keperluan">
                             <option value="timbang">Timbang</option>
                             <option value="supir">Supir</option>

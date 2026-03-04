@@ -30,37 +30,38 @@ const TEMPLATES = [
     {
         icon: '🕐',
         label: 'Jam Operasional',
-        text: 'Perhatian. Jam operasional hari ini dimulai pukul tujuh pagi hingga pukul empat sore. Terima kasih.',
+        text: 'Perhatian! Mobil bisa timbang.',
     },
     {
         icon: '⚠️',
-        label: 'Istirahat',
+        label: 'Istirahat siang',
         text: 'Perhatian kepada seluruh kendaraan. Operasional ditunda sementara karena waktu istirahat. Mohon menunggu hingga pukul satu siang. Terima kasih.',
+    },
+
+    {
+        icon: '⚠️',
+        label: 'Istirahat Sore',
+        text: 'Perhatian kepada seluruh kendaraan. Operasional ditunda sementara karena waktu istirahat. Mohon menunggu hingga pukul tujuh malam. Terima kasih.',
     },
     {
         icon: '🛑',
         label: 'Operasional Ditutup',
-        text: 'Perhatian. Operasional hari ini telah ditutup. Kendaraan yang belum terlayani mohon kembali besok. Terima kasih atas perhatiannya.',
+        text: 'Perhatian. Operasional hari ini telah ditutup. Terima kasih .',
     },
     {
         icon: '📋',
         label: 'Siapkan Dokumen',
-        text: 'Perhatian kepada seluruh kendaraan. Harap menyiapkan dokumen pengiriman dan surat jalan sebelum memasuki area timbangan. Terima kasih.',
+        text: 'Perhatian kepada kendaraan bongkar. Harap memberikan surat jalan terlebih dahulu ke loket timbangan, mobilnya di parkir, dan tunggu panggilan untuk nimbang. Terima kasih.',
     },
     {
         icon: '🚧',
-        label: 'Area Berbahaya',
-        text: 'Perhatian. Harap berhati-hati di area timbangan. Dilarang keluar dari kendaraan kecuali di tempat yang telah ditentukan. Terima kasih.',
+        label: 'Peringatan',
+        text: 'Perhatian. Harap berhati-hati saat masuk ke area timbangan. Terima kasih.',
     },
     {
         icon: '📢',
         label: 'Antri Tertib',
-        text: 'Perhatian kepada seluruh pengemudi. Mohon antri dengan tertib dan mengikuti arahan petugas. Terima kasih atas kerjasamanya.',
-    },
-    {
-        icon: '🔔',
-        label: 'Pengumuman Umum',
-        text: 'Perhatian. Ada pengumuman penting dari pihak manajemen. Mohon seluruh kendaraan untuk standby dan menunggu instruksi lebih lanjut.',
+        text: 'Perhatian kepada seluruh pengemudi. Mohon antri dengan tertib. Terima kasih atas kerjasamanya.',
     },
     {
         icon: '🅿️',
@@ -373,7 +374,6 @@ function quickCall() {
     speak(state.lastCalled, () =>{
         document.getElementById('current-call-box').style.display = 'none';
     });
-
     const box = document.getElementById('current-call-box');
     box.style.display = 'block';
     document.getElementById('current-call-name').textContent = name;
