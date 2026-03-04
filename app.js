@@ -23,8 +23,6 @@ let settings = {
     rate: 1.0,
     pitch: 1.0,
     volume: 1.0,
-    prefix: 'Kendaraan dengan nomor polisi',
-    suffix: 'harap segera menuju area timbangan. Terima kasih.',
 };
 
 // ─── TEMPLATES PENGUMUMAN ────────────────────────────────────────────────────
@@ -241,9 +239,11 @@ function setSpeakingStatus(active) {
 // ─── QUEUE MANAGEMENT ────────────────────────────────────────────────────────
 function addToQueue() {
     const platInput    = document.getElementById('input-plat');
+    const vendorInput = document.getElementById('input-vendor');
     const kerluanInput = document.getElementById('input-keperluan');
 
     const name     = platInput.value.trim().toUpperCase();
+    const vendor   = vendorInput.value.trim();
     const keperluan = kerluanInput.value.trim();
 
     if (!name) {
@@ -258,29 +258,53 @@ function addToQueue() {
         keperluan,
         time:   formatTime(new Date()),
         called: false,
-    };
+        vendor,
+    }
 
     state.queue.push(item);
     platInput.value   = '';
     kerluanInput.value = '';
+    vendorInput.value = '';
     platInput.focus();
 
     updateQueueUI();
     showToast(`✅ "${name}" ditambahkan ke antrian`, 'success');
 }
 
-function callNext() {
+function callAll() {
     const uncalled = state.queue.filter(q => !q.called);
     if (uncalled.length === 0) {
         showToast('ℹ️ Tidak ada antrian tersisa', 'info');
         return;
     }
-    callItem(uncalled[0]);
+
+    let index = 0;
+
+    function callNext() {
+        if (index >= uncalled.length) {
+            document.getElementById('current-call-box').style.display = 'none';
+            showToast('✅ Semua antrian telah dipanggil', 'success');
+            return;
+        }
+        const item = uncalled[index++];
+        item.called = true;
+        state.lastCalled = buildCallText(item.name, item.vendor, item.keperluan);
+
+        document.getElementById('current-call-box').style.display = 'block';
+        document.getElementById('current-call-name').textContent = item.name;
+
+        updateQueueUI();
+        showToast(`🔊 Memanggil: ${item.name} (${index}/${uncalled.length})`, 'info');
+
+        speak(state.lastCalled, callNext);
+    }
+
+    callNext();
 }
 
 function callItem(item) {
     item.called = true;
-    state.lastCalled = buildCallText(item.name);
+    state.lastCalled = buildCallText(item.name, item.vendor, item.keperluan);
 
     const box = document.getElementById('current-call-box');
     box.style.display = 'block';
@@ -298,19 +322,42 @@ function spellPlate(name) {
         .join('  ');
 }
 
-function buildCallText(name) {
-    const prefix = settings.prefix || '';
-    const suffix = settings.suffix || '';
-    return `${prefix} ${spellPlate(name)}. ${suffix}`.replace(/\s+/g, ' ').trim();
+function buildCallText(name, vendor, keperluan) {
+    const vendorPart    = vendor ? vendor + ' '  : '';
+    const plate = spellPlate(name);
+
+    if (keperluan === 'supir') {
+        return `kendaraan ${vendorPart}${plate}, supirnya harap ke loket timbangan. supirnya saja, mobilnya diparkir.`.replace(/\s+/g, ' ').trim();
+    }
+    return `kendaraan ${vendorPart}${plate} harap segera timbang.`.replace(/\s+/g, ' ').trim();
 }
 
 function repeatCall() {
-    if (!state.lastCalled) {
-        showToast('ℹ️ Belum ada panggilan sebelumnya', 'info');
-        return;
+    const called = state.queue.filter(q => q.called);
+    if (called.length === 0) {
+        showToast('ℹ️ Belum ada antrian yang dipanggil', 'info');
+        return; 
     }
-    speak(state.lastCalled);
-    showToast('🔂 Mengulang panggilan...', 'info');
+    let index = 0;
+
+    function repeatNext() {
+        if (index >= called.length) {
+            document.getElementById('current-call-box').style.display = 'none';
+            showToast('✅ Semua antrian telah diulang', 'success');
+            return;
+        }
+        const item = called[index++];
+        const text = buildCallText(item.name, item.vendor, item.keperluan);
+        state.lastCalled = text;
+
+        document.getElementById('current-call-box').style.display = 'block';
+        document.getElementById('current-call-name').textContent = item.name;
+
+        showToast(`Mengulang ${item.name} (${index}/${called.length})`, 'info');
+        speak(text, repeatNext);
+    }
+
+    repeatNext();
 }
 
 function quickCall() {
@@ -473,8 +520,6 @@ function saveSettings() {
     settings.rate     = parseFloat(document.getElementById('setting-rate').value);
     settings.pitch    = parseFloat(document.getElementById('setting-pitch').value);
     settings.volume   = parseFloat(document.getElementById('setting-volume').value);
-    settings.prefix   = document.getElementById('setting-prefix').value;
-    settings.suffix   = document.getElementById('setting-suffix').value;
 
     localStorage.setItem('tts_settings', JSON.stringify(settings));
     showToast('💾 Pengaturan disimpan!', 'success');
@@ -489,8 +534,6 @@ function loadSettings() {
     document.getElementById('setting-rate').value   = settings.rate;
     document.getElementById('setting-pitch').value  = settings.pitch;
     document.getElementById('setting-volume').value = settings.volume;
-    document.getElementById('setting-prefix').value = settings.prefix;
-    document.getElementById('setting-suffix').value = settings.suffix;
 
     document.getElementById('rate-val').textContent   = settings.rate.toFixed(1);
     document.getElementById('pitch-val').textContent  = settings.pitch.toFixed(1);
