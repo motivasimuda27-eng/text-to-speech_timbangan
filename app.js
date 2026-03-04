@@ -370,7 +370,9 @@ function quickCall() {
     }
 
     state.lastCalled = buildCallText(name);
-    speak(state.lastCalled);
+    speak(state.lastCalled, () =>{
+        document.getElementById('current-call-box').style.display = 'none';
+    });
 
     const box = document.getElementById('current-call-box');
     box.style.display = 'block';
