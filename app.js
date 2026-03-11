@@ -311,7 +311,9 @@ function callItem(item) {
     box.style.display = 'block';
     document.getElementById('current-call-name').textContent = item.name;
 
-    speak(state.lastCalled);
+    speak(state.lastCalled, () => {
+        document.getElementById('current-call-box').style.display = 'none';
+    });
     updateQueueUI();
     showToast(`🔊 Memanggil: ${item.name}`, 'info');
 }
