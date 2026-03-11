@@ -519,6 +519,13 @@ select option {
   color: var(--text);
 }
 
+.queue-vendor {
+	font-weight: 300;
+	font-size: 0.8rem;
+	letter-spacing: 1px;
+	color: var(--text);
+}
+
 .queue-keperluan {
   font-size: 0.8rem;
   color: var(--text-muted);

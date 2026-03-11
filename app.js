@@ -61,7 +61,7 @@ const TEMPLATES = [
     {
         icon: '📢',
         label: 'Antri Tertib',
-        text: 'Perhatian kepada seluruh pengemudi. Mohon antri dengan tertib. Terima kasih atas kerjasamanya.',
+        text: 'Mohon antri dengan tertib dan tunggu kendaraan yang di atas timbangan maju terlebih dahulu, sebelum memasuki area timbangan.',
     },
     {
         icon: '🅿️',
@@ -392,6 +392,7 @@ function removeQueueItem(id) {
 function callQueueItem(id) {
     const item = state.queue.find(q => q.id === id);
     if (item) callItem(item);
+	
 }
 
 function clearQueue() {
@@ -432,6 +433,7 @@ function updateQueueUI() {
         <div class="queue-num">${idx + 1}</div>
         <div class="queue-info">
           <div class="queue-name">${escHtml(item.name)}</div>
+		  <div class="queue-vendor">${escHtml(item.vendor)}</div>
           ${item.keperluan ? `<div class="queue-keperluan">📌 ${escHtml(item.keperluan)}</div>` : ''}
         </div>
         <div class="queue-time">${item.time}</div>
