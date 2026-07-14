@@ -1,2 +1,6 @@
-/venv/
-/__pychache__/
+venv/
+__pycache__/
+*.pyc
+scraped_data.json
+scraper_config.json
+scraper_cookies.json
