@@ -60,6 +60,10 @@
                 onclick="switchTab('settings')">
                 Pengaturan
             </button>
+            <button class="tab-btn" id="tab-import-btn" role="tab" aria-selected="false"
+                onclick="switchTab('import')">
+                📥 Import Dashboard
+            </button>
         </nav>
 
         <!-- ===================== TAB: ANTRIAN ===================== -->
@@ -237,6 +241,80 @@
                     <div class="info-row"><span>Versi App</span><span>2.0.0 (edge-tts)</span></div>
                 </div>
             </div>
+        </section>
+
+        <!-- ===================== TAB: IMPORT DASHBOARD ===================== -->
+        <section class="tab-panel hidden" id="panel-import">
+
+            <!-- Config -->
+            <div class="card">
+                <h2 class="card-title">⚙️ Konfigurasi Dashboard</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="import-url">URL Dashboard</label>
+                        <input type="text" id="import-url" value="https://dashboardcpmanuf.wingscorp.com:3000"
+                            autocomplete="off" />
+                    </div>
+                    <div class="setting-item">
+                        <label for="import-plant">Plant</label>
+                        <input type="text" id="import-plant" value="1001" autocomplete="off" />
+                    </div>
+                    <div class="setting-item">
+                        <label for="import-transplan">Transport Plan</label>
+                        <input type="text" id="import-transplan" value="H191" autocomplete="off" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Fetch -->
+            <div class="card">
+                <div class="input-row">
+                    <button class="btn btn-primary btn-lg" onclick="fetchDashboard()" id="btn-fetch">
+                        📡 Ambil Data dari Dashboard
+                    </button>
+                    <span class="badge" id="fetch-status">Siap</span>
+                </div>
+                <div id="fetch-loading" style="display:none;margin-top:12px;">
+                    <div class="spinner"></div>
+                    <span style="margin-left:8px;">Mengambil data dari dashboard...</span>
+                </div>
+                <p class="card-desc" style="margin-top:8px;">
+                    ⚡ Hanya menampilkan kendaraan <strong>timbang in Bongkar</strong>
+                    (type_desc: Bongkar Po Vendor / bongkar lain-lain).
+                    Tidak perlu Playwright/Chromium — langsung pakai HTTP request.
+                </p>
+            </div>
+
+            <!-- Hasil Fetch -->
+            <div class="card" id="fetch-result-card" style="display:none;">
+                <div class="card-header-row">
+                    <h2 class="card-title">📋 Data dari Dashboard</h2>
+                    <span class="badge" id="fetch-count">0 kendaraan</span>
+                </div>
+                <div class="scrape-table-wrap">
+                    <table class="scrape-table" id="fetch-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nomor Polisi</th>
+                                <th>Nama Vendor</th>
+                                <th>Tipe</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fetch-tbody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top:12px;">
+                    <button class="btn btn-success" onclick="importAllFetch()" id="btn-import-all">
+                        ✅ Import Semua ke Antrian
+                    </button>
+                    <button class="btn btn-outline" onclick="importSelectedFetch()" id="btn-import-selected">
+                        ✅ Import Terpilih
+                    </button>
+                </div>
+            </div>
+
         </section>
 
     </main>

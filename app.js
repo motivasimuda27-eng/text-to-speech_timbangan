@@ -102,7 +102,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ─── TAB SWITCHING ───────────────────────────────────────────────────────────
 function switchTab(tab) {
-    const panels = ['queue', 'announce', 'settings'];
+    const panels = ['queue', 'announce', 'settings', 'import'];
     panels.forEach(p => {
         document.getElementById(`panel-${p}`).classList.toggle('hidden', p !== tab);
         const btn = document.getElementById(`tab-${p}-btn`);
@@ -435,13 +435,16 @@ function updateQueueUI() {
         <div class="queue-num">${idx + 1}</div>
         <div class="queue-info">
           <div class="queue-name">${escHtml(item.name)}</div>
-		  <div class="queue-vendor">${escHtml(item.vendor)}</div>
+          <div class="queue-vendor">${escHtml(item.vendor)}</div>
           ${item.keperluan ? `<div class="queue-keperluan">📌 ${escHtml(item.keperluan)}</div>` : ''}
         </div>
         <div class="queue-time">${item.time}</div>
         <div class="queue-item-actions">
           ${!item.called
-            ? `<button class="btn-icon" onclick="callQueueItem(${item.id})" title="Panggil">📢</button>`
+            ? `<button class="btn-icon" onclick="callQueueItem(${item.id})" title="Panggil">📢</button>
+               <button class="btn-icon" onclick="editVendor(${item.id})" title="Edit Vendor">✏️</button>
+               <button class="btn-icon" onclick="moveUp(${item.id})" title="Naik">⬆</button>
+               <button class="btn-icon" onclick="moveDown(${item.id})" title="Turun">⬇</button>`
             : `<span style="font-size:0.8rem;color:var(--success)">✓ Dipanggil</span>`
           }
           <button class="btn-icon remove" onclick="removeQueueItem(${item.id})" title="Hapus">✕</button>
@@ -591,4 +594,142 @@ function showToast(msg, type = 'info') {
     toast.className   = `toast ${type} show`;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ─── REORDER / EDIT VENDOR ───────────────────────────────────────────────────
+function editVendor(id) {
+    const item = state.queue.find(q => q.id === id);
+    if (!item) return;
+    const newVendor = prompt('Edit nama vendor:', item.vendor || '');
+    if (newVendor === null) return; // batal
+    item.vendor = newVendor.trim();
+    updateQueueUI();
+    showToast(`✅ Vendor ${item.name} diupdate`, 'success');
+}
+
+function moveUp(id) {
+    const idx = state.queue.findIndex(q => q.id === id);
+    if (idx <= 0) return;
+    [state.queue[idx - 1], state.queue[idx]] = [state.queue[idx], state.queue[idx - 1]];
+    updateQueueUI();
+}
+
+function moveDown(id) {
+    const idx = state.queue.findIndex(q => q.id === id);
+    if (idx === -1 || idx >= state.queue.length - 1) return;
+    [state.queue[idx], state.queue[idx + 1]] = [state.queue[idx + 1], state.queue[idx]];
+    updateQueueUI();
+}
+
+// ─── IMPORT DASHBOARD ────────────────────────────────────────────────────────
+
+/** Data hasil fetch terakhir */
+let _fetchResult = [];
+
+async function fetchDashboard() {
+    const btn = document.getElementById('btn-fetch');
+    const status = document.getElementById('fetch-status');
+    const loading = document.getElementById('fetch-loading');
+    const resultCard = document.getElementById('fetch-result-card');
+
+    const url = document.getElementById('import-url').value.trim();
+    const plant = document.getElementById('import-plant').value.trim();
+    const transplan = document.getElementById('import-transplan').value.trim();
+
+    btn.disabled = true;
+    status.textContent = 'Mengambil data...';
+    loading.style.display = 'flex';
+    resultCard.style.display = 'none';
+    _fetchResult = [];
+
+    try {
+        const res = await fetch(`${TTS_SERVER}/fetch-antrian`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dashboard_url: url, plant, transplan }),
+        });
+        const result = await res.json();
+
+        if (!result.success) {
+            showToast(`❌ Gagal: ${result.error || 'Unknown error'}`, 'error');
+            status.textContent = '❌ Gagal';
+            return;
+        }
+
+        _fetchResult = result.data || [];
+        renderFetchResult();
+        if (_fetchResult.length > 0) {
+            resultCard.style.display = 'block';
+            showToast(`✅ ${_fetchResult.length} kendaraan ditemukan`, 'success');
+            status.textContent = `✅ ${_fetchResult.length} data`;
+        } else {
+            status.textContent = '✅ 0 data (kosong)';
+            showToast('ℹ️ Tidak ada data Bongkar masuk', 'info');
+        }
+    } catch (err) {
+        showToast(`❌ Gagal fetch: ${err.message}`, 'error');
+        status.textContent = '❌ Error';
+        console.error('[fetchDashboard]', err);
+    } finally {
+        btn.disabled = false;
+        loading.style.display = 'none';
+    }
+}
+
+function renderFetchResult() {
+    const tbody = document.getElementById('fetch-tbody');
+    const count = document.getElementById('fetch-count');
+
+    count.textContent = `${_fetchResult.length} kendaraan`;
+
+    tbody.innerHTML = _fetchResult.map((item, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${escHtml(item.no_polisi)}</td>
+      <td>${escHtml(item.vendor)}</td>
+      <td>${escHtml(item.type_desc)}</td>
+      <td>
+        <input type="checkbox" class="fetch-check" data-index="${i}" checked />
+      </td>
+    </tr>
+  `).join('');
+}
+
+function _addToQueueFromData(dataItem) {
+    const noPolisi = (dataItem.no_polisi || '').trim().toUpperCase();
+    if (!noPolisi) return;
+    state.queue.push({
+        id: state.nextId++,
+        name: noPolisi,
+        vendor: (dataItem.vendor || '').trim(),
+        keperluan: 'timbang',
+        time: formatTime(new Date()),
+        called: false,
+    });
+}
+
+function importAllFetch() {
+    if (_fetchResult.length === 0) {
+        showToast('ℹ️ Tidak ada data untuk diimport', 'info');
+        return;
+    }
+    _fetchResult.forEach(item => _addToQueueFromData(item));
+    updateQueueUI();
+    showToast(`✅ ${_fetchResult.length} kendaraan diimport ke antrian`, 'success');
+}
+
+function importSelectedFetch() {
+    const checks = document.querySelectorAll('.fetch-check:checked');
+    if (checks.length === 0) {
+        showToast('ℹ️ Pilih kendaraan yang ingin diimport', 'info');
+        return;
+    }
+    let count = 0;
+    checks.forEach(cb => {
+        const idx = parseInt(cb.dataset.index);
+        const item = _fetchResult[idx];
+        if (item) { _addToQueueFromData(item); count++; }
+    });
+    updateQueueUI();
+    showToast(`✅ ${count} kendaraan diimport ke antrian`, 'success');
 }
