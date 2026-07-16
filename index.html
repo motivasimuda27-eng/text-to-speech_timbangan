@@ -22,7 +22,7 @@
             <div class="header-logo">
                 <span class="logo-icon">📢</span>
                 <div>
-                    <h1 class="header-title">Sistem Speech Antrian & Pengumuman Timbangan</h1>
+                    <h1 class="header-title">Sistem Speech Antrian & Pengumuman Timbangan V2</h1>
                     <p class="header-sub">© 2026 Huda Timbangan BAS</p>
                 </div>
             </div>
@@ -52,6 +52,10 @@
                 onclick="switchTab('queue')">
                 Antrian Kendaraan
             </button>
+			<button class="tab-btn" id="tab-import-btn" role="tab" aria-selected="false"
+                onclick="switchTab('import')">
+                Import Dashboard
+            </button>
             <button class="tab-btn" id="tab-announce-btn" role="tab" aria-selected="false"
                 onclick="switchTab('announce')">
                 Pengumuman
@@ -59,10 +63,6 @@
             <button class="tab-btn" id="tab-settings-btn" role="tab" aria-selected="false"
                 onclick="switchTab('settings')">
                 Pengaturan
-            </button>
-            <button class="tab-btn" id="tab-import-btn" role="tab" aria-selected="false"
-                onclick="switchTab('import')">
-                📥 Import Dashboard
             </button>
         </nav>
 
@@ -74,13 +74,13 @@
                 <h2 class="card-title">➕ Tambah Antrian</h2>
                 <div class="input-row">
                     <div class="input-group">
-                        <label for="input-plat">Nomor Polisi / Nama</label>
-                        <input type="text" id="input-plat" placeholder="Masukan nomor polisi"
+                        <label for="input-plat">Nomor Polisi</label>
+                        <input type="text" id="input-plat" 
                             autocomplete="off" />
                     </div>
                     <div class="input-group">
                         <label for="input-vendor">Nama Vendor</label>
-                        <input type="text" id="input-vendor" placeholder="Masukan nama vendor"
+                        <input type="text" id="input-vendor" 
                             autocomplete="off" />
                     </div>
                     <div class="input-group">
@@ -103,10 +103,10 @@
                 <div class="input-row">
                     <div class="input-group">
                         <label for="input-quick">Nomor / Nama Kendaraan</label>
-                        <input type="text" id="input-quick" placeholder="Ketik dan klik Panggil" autocomplete="off" />
+                        <input type="text" id="input-quick" autocomplete="off" />
                     </div>
                     <button class="btn btn-accent" onclick="quickCall()" id="btn-quick">
-                        📢 Panggil Sekarang
+                        Panggil Sekarang
                     </button>
                 </div>
             </div>
@@ -164,13 +164,13 @@
                 <h2 class="card-title">✏️ Pengumuman Kustom</h2>
                 <div class="input-group">
                     <label for="input-announce">Teks Pengumuman</label>
-                    <textarea id="input-announce" rows="4" placeholder="Ketik teks pengumuman di sini..."></textarea>
+                    <textarea id="input-announce" rows="4" ></textarea>
                 </div>
                 <div class="input-row" style="margin-top:12px;">
                     <button class="btn btn-accent" onclick="announceCustom()" id="btn-announce">
-                        📢 Umumkan
+                        Umumkan
                     </button>
-                    <button class="btn btn-outline" onclick="clearAnnounce()">🗑️ Hapus Teks</button>
+                    <button class="btn btn-outline" onclick="clearAnnounce()">Hapus Teks</button>
                 </div>
             </div>
 
@@ -255,7 +255,7 @@
                         <select id="import-lokasi" onchange="onLokasiChange()">
                             <option value="AMG">AMG (Plant 1001 / H191)</option>
                             <option value="BAS">BAS (Plant 1006 / H201)</option>
-                            <option value="SMU">SMU (Plant 1016 / S20i)</option>
+                            <option value="SMU">SMU (Plant 1016 / S023)</option>
                         </select>
                     </div>
                 </div>
@@ -268,7 +268,7 @@
             <div class="card">
                 <div class="input-row">
                     <button class="btn btn-primary btn-lg" onclick="fetchDashboard()" id="btn-fetch">
-                        📡 Ambil Data dari Dashboard
+                        Ambil Data dari Dashboard
                     </button>
                     <span class="badge" id="fetch-status">Siap</span>
                 </div>
@@ -300,10 +300,10 @@
                 </div>
                 <div style="margin-top:12px;">
                     <button class="btn btn-success" onclick="importAllFetch()" id="btn-import-all">
-                        ✅ Import Semua ke Antrian
+                        Import Semua ke Antrian
                     </button>
                     <button class="btn btn-outline" onclick="importSelectedFetch()" id="btn-import-selected">
-                        ✅ Import Terpilih
+                        Import Terpilih
                     </button>
                 </div>
             </div>

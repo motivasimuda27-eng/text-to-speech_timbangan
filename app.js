@@ -51,7 +51,7 @@ const TEMPLATES = [
     {
         icon: '📋',
         label: 'Siapkan Dokumen',
-        text: 'Perhatian kepada kendaraan bongkar. Harap memberikan surat jalan terlebih dahulu ke loket timbangan, mobilnya di parkir, dan tunggu panggilan untuk nimbang. Terima kasih.',
+        text: 'Perhatian kepada kendaraan bongkar yang baru datang. Harap memberikan surat jalan terlebih dahulu ke loket timbangan, mobilnya di parkir, dan tunggu panggilan untuk nimbang. Terima kasih.',
     },
     {
         icon: '🚧',
@@ -628,7 +628,7 @@ function moveDown(id) {
 const LOKASI_CONFIG = {
     AMG: { plant: '1001', transplan: 'H191' },
     BAS: { plant: '1006', transplan: 'H201' },
-    SMU: { plant: '1016', transplan: 'S20i' },
+    SMU: { plant: '1016', transplan: 'S023' },
 };
 
 function onLokasiChange() {
