@@ -85,6 +85,7 @@ window.addEventListener('DOMContentLoaded', () => {
     updateQueueUI();
     setSystemInfo();
     loadEdgeVoices();
+    onLokasiChange(); // init dropdown lokasi display
 
     document.getElementById('input-plat').addEventListener('keydown', e => {
         if (e.key === 'Enter') addToQueue();
@@ -623,6 +624,20 @@ function moveDown(id) {
 
 // ─── IMPORT DASHBOARD ────────────────────────────────────────────────────────
 
+/** Konfigurasi per lokasi */
+const LOKASI_CONFIG = {
+    AMG: { plant: '1001', transplan: 'H191' },
+    BAS: { plant: '1006', transplan: 'H201' },
+    SMU: { plant: '1016', transplan: 'S20i' },
+};
+
+function onLokasiChange() {
+    const val = document.getElementById('import-lokasi').value;
+    const cfg = LOKASI_CONFIG[val] || LOKASI_CONFIG['AMG'];
+    document.getElementById('import-url-display').textContent =
+        `https://dashboardcpmanuf.wingscorp.com:3000 (plant ${cfg.plant} / ${cfg.transplan})`;
+}
+
 /** Data hasil fetch terakhir */
 let _fetchResult = [];
 
@@ -632,9 +647,8 @@ async function fetchDashboard() {
     const loading = document.getElementById('fetch-loading');
     const resultCard = document.getElementById('fetch-result-card');
 
-    const url = document.getElementById('import-url').value.trim();
-    const plant = document.getElementById('import-plant').value.trim();
-    const transplan = document.getElementById('import-transplan').value.trim();
+    const lokasi = document.getElementById('import-lokasi').value;
+    const cfg = LOKASI_CONFIG[lokasi] || LOKASI_CONFIG['AMG'];
 
     btn.disabled = true;
     status.textContent = 'Mengambil data...';
@@ -646,7 +660,11 @@ async function fetchDashboard() {
         const res = await fetch(`${TTS_SERVER}/fetch-antrian`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dashboard_url: url, plant, transplan }),
+            body: JSON.stringify({
+                dashboard_url: 'https://dashboardcpmanuf.wingscorp.com:3000',
+                plant: cfg.plant,
+                transplan: cfg.transplan,
+            }),
         });
         const result = await res.json();
 

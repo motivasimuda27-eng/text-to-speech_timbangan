@@ -248,22 +248,20 @@
 
             <!-- Config -->
             <div class="card">
-                <h2 class="card-title">⚙️ Konfigurasi Dashboard</h2>
+                <h2 class="card-title">⚙️ Pilih Lokasi</h2>
                 <div class="settings-grid">
                     <div class="setting-item">
-                        <label for="import-url">URL Dashboard</label>
-                        <input type="text" id="import-url" value="https://dashboardcpmanuf.wingscorp.com:3000"
-                            autocomplete="off" />
-                    </div>
-                    <div class="setting-item">
-                        <label for="import-plant">Plant</label>
-                        <input type="text" id="import-plant" value="1001" autocomplete="off" />
-                    </div>
-                    <div class="setting-item">
-                        <label for="import-transplan">Transport Plan</label>
-                        <input type="text" id="import-transplan" value="H191" autocomplete="off" />
+                        <label for="import-lokasi">Lokasi</label>
+                        <select id="import-lokasi" onchange="onLokasiChange()">
+                            <option value="AMG">AMG (Plant 1001 / H191)</option>
+                            <option value="BAS">BAS (Plant 1006 / H201)</option>
+                            <option value="SMU">SMU (Plant 1016 / S20i)</option>
+                        </select>
                     </div>
                 </div>
+                <p class="card-desc" style="margin-top:4px;">
+                    URL Dashboard: <code id="import-url-display">https://dashboardcpmanuf.wingscorp.com:3000</code>
+                </p>
             </div>
 
             <!-- Tombol Fetch -->
@@ -278,11 +276,6 @@
                     <div class="spinner"></div>
                     <span style="margin-left:8px;">Mengambil data dari dashboard...</span>
                 </div>
-                <p class="card-desc" style="margin-top:8px;">
-                    ⚡ Hanya menampilkan kendaraan <strong>timbang in Bongkar</strong>
-                    (type_desc: Bongkar Po Vendor / bongkar lain-lain).
-                    Tidak perlu Playwright/Chromium — langsung pakai HTTP request.
-                </p>
             </div>
 
             <!-- Hasil Fetch -->
