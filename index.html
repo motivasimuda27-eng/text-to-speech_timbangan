@@ -292,7 +292,9 @@
                                 <th>Nomor Polisi</th>
                                 <th>Nama Vendor</th>
                                 <th>Tipe</th>
-                                <th>Aksi</th>
+                                <th style="text-align:center;">
+                                    <input type="checkbox" id="fetch-check-all" onchange="toggleCheckAllFetch()" title="Pilih/Hapus semua" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="fetch-tbody"></tbody>
@@ -304,6 +306,12 @@
                     </button>
                     <button class="btn btn-outline" onclick="importSelectedFetch()" id="btn-import-selected">
                         Import Terpilih
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="checkAllFetch()" id="btn-check-all">
+                        Ceklist Semua
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="uncheckAllFetch()" id="btn-uncheck-all">
+                        Unceklist Semua
                     </button>
                 </div>
             </div>

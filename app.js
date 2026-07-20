@@ -706,11 +706,14 @@ function renderFetchResult() {
       <td>${escHtml(item.no_polisi)}</td>
       <td>${escHtml(item.vendor)}</td>
       <td>${escHtml(item.type_desc)}</td>
-      <td>
+      <td style="text-align:center;">
         <input type="checkbox" class="fetch-check" data-index="${i}" checked />
       </td>
     </tr>
   `).join('');
+
+    // Reset header checkbox state saat render ulang
+    document.getElementById('fetch-check-all').checked = true;
 }
 
 function _addToQueueFromData(dataItem) {
@@ -750,4 +753,24 @@ function importSelectedFetch() {
     });
     updateQueueUI();
     showToast(`✅ ${count} kendaraan diimport ke antrian`, 'success');
+}
+
+function checkAllFetch() {
+    const checks = document.querySelectorAll('.fetch-check');
+    checks.forEach(cb => cb.checked = true);
+    document.getElementById('fetch-check-all').checked = true;
+    showToast('Semua kendaraan dipilih', 'info');
+}
+
+function uncheckAllFetch() {
+    const checks = document.querySelectorAll('.fetch-check');
+    checks.forEach(cb => cb.checked = false);
+    document.getElementById('fetch-check-all').checked = false;
+    showToast('Semua kendaraan tidak dipilih', 'info');
+}
+
+function toggleCheckAllFetch() {
+    const headerCheck = document.getElementById('fetch-check-all');
+    const checks = document.querySelectorAll('.fetch-check');
+    checks.forEach(cb => cb.checked = headerCheck.checked);
 }
